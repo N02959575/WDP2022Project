@@ -1,0 +1,105 @@
+* {
+
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+
+body {
+    background-color: rgb(173, 245, 173);
+}
+
+.login-registration {
+
+    text-align: center;
+    border: 2px solid rgb(105, 198, 105);
+    border-radius: 20px;
+    margin: 250px auto;
+
+    max-width:500px;
+    padding: 50px;
+    padding-bottom: 10px;
+
+
+}
+
+nav {
+    
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgb(76, 210, 76);
+
+}
+
+nav img {
+    float: left;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: block;
+    margin: auto;
+}
+
+a {
+    font-size: large;
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+
+a:hover {
+    background-color: green;
+}
+
+.input-fields {
+    text-align: left;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.button {
+
+    color: white;
+    background-color: rgb(76, 210, 76);
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(105, 198, 105);
+    border-radius: 25px;
+    padding: 5px 15px 5px 15px;
+    margin-top: 40px;
+}
+
+
+.note-field {
+    color: white;
+    background-image: url(images/note-background.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 20px;
+    margin: 250px auto;
+    max-width:500px;
+    padding: 20px 85px 10px 85px;
+    
+}
+
+.note-input {
+    text-align: center;
+    margin: 80px auto;
+    max-width:500px;
+}
+
+.note-input input[type=text] {
+
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+
+}
