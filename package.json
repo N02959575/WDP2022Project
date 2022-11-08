@@ -1,0 +1,26 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "description": "wdp2022 project",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/N02959575/WDP2022Project.git"
+  },
+  "author": "Mario Mena",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/N02959575/WDP2022Project/issues"
+  },
+  "homepage": "https://github.com/N02959575/WDP2022Project#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
