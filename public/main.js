@@ -49,8 +49,9 @@ class User {
 
 //NOTE Class
 class Note {
-    constructor(id, content, date) {
+    constructor(id, username, content, date) {
         this.noteId = id
+        this.noteCreator = username
         this.noteContent = content
         this.noteCreationDate = date
     }
@@ -60,6 +61,10 @@ class Note {
         return this.noteContent
     }
 
+    getNoteCreator(){
+        return this.noteCreator
+    }
+
     getNoteCreationDate(){
         return this.noteCreationDate
     }
@@ -67,6 +72,10 @@ class Note {
     //setters
     setNote(content) {
         this.noteContent = content
+    }
+
+    setNoteCretor(username){
+        this.getNoteCreator = username
     }
 
     setNoteCreationDate(date){
@@ -110,9 +119,22 @@ function login(e){//logs in a user
     //get login user input
     let username = document.getElementById('username').value
     let password = document.getElementById('passwd').value
+    let user = new User(null, username, null, null, password);
 
     //print username and password entered by user
     console.log(`username: ${username}\npasword: ${password}`)
+    console.log(user)
+
+    //fetch data from server////////////////////////////////////////////////////////needs testing still
+    fetchData("/users/login", user, "POST")
+    .then((data) => {
+      console.log(data)
+      window.location.href = "note.html"
+    })
+    .catch((err) => {
+      console.log(`Error!!! ${err.message}`)
+    })
+    /////////////////////////////////////////////////////////////////////////////////
 }
 
 function addNote(e){
@@ -140,3 +162,24 @@ function addNote(e){
     //erase input from form
     document.getElementById('note').value = ''
 }
+
+// Fetch method implementation:
+async function fetchData(route = '', data = {}, methodType) {
+    const response = await fetch(`http://localhost:3000${route}`, {
+      method: methodType, // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+    if(response.ok) {
+      return await response.json(); // parses JSON response into native JavaScript objects
+    } else {
+      throw await response.json();
+    }
+  }
