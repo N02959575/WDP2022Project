@@ -90,11 +90,13 @@ const noteForm = document.getElementById('noteForm')//from note.html
 
 //Grabbing sections
 const notes = document.getElementById('noteList')//from note.html
+const users = document.getElementById('userList')//from login.html
 
 //Event listeners
 if(registerForm) registerForm.addEventListener('submit', registerUser)
 if(loginForm) loginForm.addEventListener('submit', login)
 if(noteForm) noteForm.addEventListener('submit', addNote)
+document.getElementById('btn-users').addEventListener('click', displayUsers)//for user display button in login.html
 
 //Functions
 function registerUser(e){//registers a user
@@ -125,7 +127,7 @@ function login(e){//logs in a user
     console.log(`username: ${username}\npasword: ${password}`)
     console.log(user)
 
-    //fetch data from server////////////////////////////////////////////////////////needs testing still
+    //fetch data from server
     fetchData("/users/login", user, "POST")
     .then((data) => {
       console.log(data)
@@ -134,7 +136,6 @@ function login(e){//logs in a user
     .catch((err) => {
       console.log(`Error!!! ${err.message}`)
     })
-    /////////////////////////////////////////////////////////////////////////////////
 }
 
 function addNote(e){
@@ -162,6 +163,32 @@ function addNote(e){
     //erase input from form
     document.getElementById('note').value = ''
 }
+
+function displayUsers(e) {
+    e.preventDefault()
+
+    if(users.innerText === ""){ 
+        fetch("http://localhost:3000/users")
+        .then((res) => res.json()) //JSON.parse(res)
+        .then((data) => {
+        console.log(data)
+        data.forEach(user => {
+            let section = `
+                <div class="user">
+                    <p>${user.username}</p>
+                </div>
+            `
+            users.innerHTML += section
+        })
+        })
+        .catch((err) => {
+        console.log(`Error!!! ${err.message}`)
+        })
+    }
+    users.classList.toggle('hide')///////////////
+}
+
+
 
 // Fetch method implementation:
 async function fetchData(route = '', data = {}, methodType) {
