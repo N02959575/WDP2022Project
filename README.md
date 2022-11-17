@@ -18,4 +18,4 @@
 
 ### Project's ERD:
 
-![Notetaking webb app erd](images/erd.PNG)
+![Notetaking webb app erd](public/images/erd.PNG)
