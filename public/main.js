@@ -9,6 +9,10 @@ class User {
     }
 
     //getters
+    getUserId(){
+        return this.userId
+    }
+
     getUsername() {
         return this.username
     }
@@ -49,9 +53,9 @@ class User {
 
 //NOTE Class
 class Note {
-    constructor(id, username, content, date) {
+    constructor(id, userId, content, date) {
         this.noteId = id
-        this.noteCreator = username
+        this.noteCreator = userId
         this.noteContent = content
         this.noteCreationDate = date
     }
