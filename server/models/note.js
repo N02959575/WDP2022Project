@@ -64,4 +64,4 @@ async function createNote(note){
   await con.query(sql)
 }
 
-module.exports = { getAllNotes };
+module.exports = { getAllNotes, createNote };
