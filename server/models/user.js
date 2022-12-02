@@ -22,7 +22,7 @@ async function getAllUsers() {
   const sql = `SELECT * FROM users;`
 
   let users = await con.query(sql)
-  console.log(users)//for testing
+  return users
 }
 
 //get a specific user from db
