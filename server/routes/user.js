@@ -32,5 +32,27 @@ router
       res.status(401).send({message: err.message})
     }
   })
+
+  //for editUser function in models/user.js
+  .put('/edit', async (req, res) => {
+    try {
+      let user = await User.editUser(req.body)
+      res.send({...user, password: undefined})
+    } 
+    catch (err) {
+      res.status(401).send({message: err.message})
+    }
+  })
+
+  //for deleteUser function in models/user.js
+  .delete('/delete', async (req, res) => {
+    try {
+      let user = await User.deleteUser(req.body)
+      res.send({success: "We'll miss you!"})
+    } 
+    catch (err) {
+      res.status(401).send({message: err.message})
+    }
+  })
   
 module.exports = router;
