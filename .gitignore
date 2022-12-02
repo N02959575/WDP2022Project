@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/node,dotenv,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,dotenv,visualstudiocode
 
+### .http files ###
+user.http
+note.http
+
 ### dotenv ###
 .env
 
