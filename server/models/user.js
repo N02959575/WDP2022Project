@@ -44,10 +44,9 @@ async function getUser(user){
 //insert new user into db
 async function register(user){
   let cUser = await getUser(user)
-
+  //check if username is already in use
   if (cUser.length > 0) throw Error ("username already in use")
 
-  //need to test again/////////////////////////////////////////
   const sql = `INSERT INTO users
   (username, userFname, userLname, userPassword)
   VALUES("${user.username}","${user.userFname}","${user.userLname}", "${user.userPassword}");`
@@ -66,4 +65,27 @@ async function login(user) { //{username: "" , userPassword: ""}
   return cUser[0];
 }
 
-module.exports = { getAllUsers, login, register };
+//allows user to modify username
+async function editUser(user){
+  let cUser = await getUser(user)
+  //check if username is already in use
+  if (cUser.length > 0) throw Error ("username already in use")
+
+  let sql = `UPDATE users
+  SET userName = "${user.username}"
+  WHERE userID = ${user.userId}`
+
+  await con.query(sql)
+  let updatedUser = await getUser(user)
+  return updatedUser[0]
+}
+
+//allows user to delete their account
+async function deleteUser(user){
+  let sql = `DELETE FROM users
+  WHERE userID = ${user.userId}`
+
+  await con.query(sql)
+}
+
+module.exports = { getAllUsers, login, register, editUser, deleteUser };
