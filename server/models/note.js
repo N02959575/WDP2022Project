@@ -1,37 +1,16 @@
-//"database" as object literal
-// const notes = [//id, username, content, date
-//     {
-//       noteId: 54321,  
-//       noteCreator: "coke",
-//       noteContent: "I'm delicious!",
-//       noteCreationDate: 11/17/2022,
-//     },
-//     {
-//       noteId: 66666,  
-//       noteCreator: "vanillaCoke",
-//       noteContent: "I'm more delicious!",
-//       noteCreationDate: 11/16/2022,
-//     },
-//     {
-//       noteId: 21432,  
-//       noteCreator: "cokeZero",
-//       noteContent: "I'm healthier?",
-//       noteCreationDate: 11/15/2022,
-//     }
-//   ];
-
 // database connection to get users
 const con = require('./db_connect')
 
 //creates the notes table in the db
 async function createTable() {
   let sql = `CREATE TABLE IF NOT EXISTS notes (
-      noteId INT NOT NULL AUTO_INCREMENT,
-      noteCreator INT REFERENCES users(userId),
-      noteContent VARCHAR(255) NOT NULL,
-      noteCreationDate DATE NOT NULL,
-      CONSTRAINT notePK PRIMARY KEY(noteId)
-  );`
+    noteId INT NOT NULL AUTO_INCREMENT,
+    noteContent VARCHAR(255),
+    noteCreationDate DATE NOT NULL,
+    userId INT NOT NULL,
+    CONSTRAINT notePK PRIMARY KEY(noteId),
+    CONSTRAINT noteFK FOREIGN KEY(userId) references users(userId)
+  ); `
 
   await con.query(sql)
 }
@@ -47,15 +26,13 @@ async function getAllNotes() {
 }
 
 //insert new note into db
-//note is added to db but getting error: Unknown column 'undefined' in 'where clause'
+//getting error: Cannot add or update a child row: a foreign key constraint fails
 async function createNote(note){
   const sql = `INSERT INTO notes
-  (noteCreator, noteContent, noteCreationDate)
-  VALUES(${note.noteCreator},"${note.noteContent}", "${note.noteCreationDate}");`
+  (noteContent, noteCreationDate, userId)
+  VALUES("${note.noteContent}","${note.noteCreationDate}", ${note.noteCreator});`
 
   await con.query(sql)
-  //this doesnt return properly need to fix
-  //return await getNote(note)
 }
 
 //get note by id from db
@@ -72,7 +49,7 @@ async function getNote(note){
 async function getAllUserNotes(note){
   let sql = `
   SELECT * FROM notes
-  WHERE noteCreator = ${note.noteCreator}`
+  WHERE userId = ${note.noteCreator}`
 
   return await con.query(sql)
 }
