@@ -1,7 +1,7 @@
 // USER Class
 class User {
-    constructor(id, username, fname, lname, password) {
-        this.userId = id
+    constructor(username, fname, lname, password) {
+        //this.userId = id
         this.username = username
         this.userFname = fname
         this.userLname = lname
@@ -9,10 +9,6 @@ class User {
     }
 
     //getters
-    getUserId(){
-        return this.userId
-    }
-
     getUsername() {
         return this.username
     }
@@ -53,8 +49,8 @@ class User {
 
 //NOTE Class
 class Note {
-    constructor(id, userId, content, date) {
-        this.noteId = id
+    constructor(userId, content, date) {
+        //this.noteId = id
         this.noteCreator = userId
         this.noteContent = content
         this.noteCreationDate = date
@@ -96,27 +92,62 @@ const noteForm = document.getElementById('noteForm')//from note.html
 const notes = document.getElementById('noteList')//from note.html
 const users = document.getElementById('userList')//from login.html
 
+//Grabbing logout button
+let logout = document.getElementById('logout-btn')
+
 //Event listeners
 if(registerForm) registerForm.addEventListener('submit', registerUser)
 if(loginForm) loginForm.addEventListener('submit', login)
 if(noteForm) noteForm.addEventListener('submit', addNote)
+if(logout) logout.addEventListener('click', removeCurrentUser)//for removing user from local storage
 document.getElementById('btn-users').addEventListener('click', displayUsers)//for user display button in login.html
+//document.getElementById('btn-notes').addEventListener('click', displayNotes)//for notes display button in note.html
 
 //Functions
+// stateful mechanism for user
+function setCurrentUser(user){//login in a user
+    localStorage.setItem('user', JSON.stringify(user))
+}
+
+/////////////////////////////////////////////////////////
+
+function getCurrentUser(){//getting curret user function
+    return JSON.parse(localStorage.getItem(('user')))
+}
+
+//////////////////////////////////////////////////////////
+
+//logout function for current user
+function removeCurrentUser(){//logout
+  localStorage.removeItem('user')
+}
+
 function registerUser(e){//registers a user
     e.preventDefault()
     
     //get new user info
-    let num = Math.floor(Math.random() * 90000) + 10000 //generate random 5-digit number
     let username = document.getElementById('username').value
     let fname = document.getElementById('fname').value
     let lname = document.getElementById('lname').value
-    let password = document.getElementById('regPasswd').value
+    let userPassword = document.getElementById('regPasswd').value
     //eventually i would like to get the confirm password to make sure they match
-    let user = new User(num, username, fname, lname, password)
+    let user = new User(username, fname, lname, userPassword)
 
-    //print user
     console.log(user)
+
+    fetchData("/users/register", user, "POST")
+    .then((data) =>{
+      //console.log(data)
+      setCurrentUser(data)
+      window.location.href = "note.html"
+    })
+    .catch((err) =>{
+      console.log(err)
+    })
+
+
+    //print user, for testing
+    //console.log(user)
 }
 
 function login(e){//logs in a user
@@ -125,47 +156,84 @@ function login(e){//logs in a user
     //get login user input
     let username = document.getElementById('username').value
     let password = document.getElementById('passwd').value
-    let user = new User(null, username, null, null, password);
+    let user = new User(username, null, null, password);
 
     //print username and password entered by user
-    console.log(`username: ${username}\npasword: ${password}`)
-    console.log(user)
+    //console.log(`username: ${username}\npasword: ${password}`)
+    //console.log(user)
 
     //fetch data from server
     fetchData("/users/login", user, "POST")
     .then((data) => {
-      console.log(data)
+      //console.log(data)
+      setCurrentUser(data)
       window.location.href = "note.html"
     })
     .catch((err) => {
       console.log(`Error!!! ${err.message}`)
     })
+
+    displayNotes()
 }
 
 function addNote(e){
     e.preventDefault()
 
     //get note entered by user
-    let note = document.getElementById('note').value
+    let noteCreator = getCurrentUser() //for testing while getCurrentUser gets fixed
+    let noteContent = document.getElementById('note').value
     let today = new Date()
-    let dateCreated = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear()
+    let noteCreationDate = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate()
+
+    let newNote = new Note(noteCreator.userId, noteContent, noteCreationDate)
+
+    fetchData("/notes/create", newNote, "POST")
+    .then((note) => {
+        console.log("note: "+ note)
+      })
+      .catch((err) => {
+        console.log(`Error!!! ${err.message}`)
+      })
 
     //print note and today's date
-    console.log(`note: ${note}\ndate created: ${dateCreated}`)
+    console.log(`note: ${noteContent}\ndate created: ${noteCreationDate}`)
 
     //display note
     notes.innerHTML += `
         <div class="note">
             <br>
-            <p>${dateCreated}:</p>
+            <p>${noteCreationDate}:</p>
             <br>
-            <p>${note}</p>
+            <p>${noteContent}</p>
         </div>
     `
 
 
     //erase input from form
     document.getElementById('note').value = ''
+}
+
+function displayNotes(){///////////doesnt work yet
+    let user = getCurrentUser()//////////////////////////needs to be fixed
+    let tempNote = new Note(user.userId)
+    console.log("getCuser: " + user.userId)
+    fetchData("/notes/getMyNotes", tempNote, "POST")
+    .then((note) => {
+        console.log("notes: "+ note)
+        notes.innerHTML += `
+        <div class="note">
+            <br>
+            <p>${note.dateCreated}:</p>
+            <br>
+            <p>${note.noteContent}</p>
+        </div>
+    `
+      })
+      .catch((err) => {
+        console.log(`Error!!! ${err.message}`)
+      })
+
+      //notes.classList.toggle('hide')///////////////
 }
 
 function displayUsers(e) {
