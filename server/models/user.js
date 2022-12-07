@@ -60,8 +60,7 @@ async function login(user) { //{username: "" , userPassword: ""}
   let cUser = await getUser(user);//gets user that matches user input from db
   if(!cUser[0]) throw Error("User not found!")
   if(cUser[0].userPassword !== user.userPassword) throw Error("Password incorrect!")
-
-  //console.log(cUser[0])//for testing
+  
   return cUser[0];
 }
 
