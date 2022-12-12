@@ -92,16 +92,17 @@ const noteForm = document.getElementById('noteForm')//from note.html
 const notes = document.getElementById('noteList')//from note.html
 const users = document.getElementById('userList')//from login.html
 
-//Grabbing logout button
+//Grabbing buttons
 let logout = document.getElementById('logout-btn')
+let usersButton = document.getElementById('btn-users')
 
 //Event listeners
 if(registerForm) registerForm.addEventListener('submit', registerUser)
 if(loginForm) loginForm.addEventListener('submit', login)
 if(noteForm) noteForm.addEventListener('submit', addNote)
 if(logout) logout.addEventListener('click', removeCurrentUser)//for removing user from local storage
-document.getElementById('btn-users').addEventListener('click', displayUsers)//for user display button in login.html
-//document.getElementById('btn-notes').addEventListener('click', displayNotes)//for notes display button in note.html
+if (usersButton) usersButton.addEventListener('click', displayUsers)//for user display button in login.html
+
 
 //Functions
 // stateful mechanism for user
@@ -109,13 +110,9 @@ function setCurrentUser(user){//login in a user
     localStorage.setItem('user', JSON.stringify(user))
 }
 
-/////////////////////////////////////////////////////////
-
 function getCurrentUser(){//getting curret user function
     return JSON.parse(localStorage.getItem(('user')))
 }
-
-//////////////////////////////////////////////////////////
 
 //logout function for current user
 function removeCurrentUser(){//logout
@@ -168,12 +165,11 @@ function login(e){//logs in a user
       //console.log(data)
       setCurrentUser(data)
       window.location.href = "note.html"
+      
     })
     .catch((err) => {
       console.log(`Error!!! ${err.message}`)
     })
-
-    displayNotes()
 }
 
 function addNote(e){
@@ -183,17 +179,19 @@ function addNote(e){
     let noteCreator = getCurrentUser() //for testing while getCurrentUser gets fixed
     let noteContent = document.getElementById('note').value
     let today = new Date()
-    let noteCreationDate = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate()
+    let noteCreationDate = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate()//for mysql format
+    let displayDate = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear() //for display on web format
 
     let newNote = new Note(noteCreator.userId, noteContent, noteCreationDate)
+    console.log("note: "+ newNote.getNote)
 
     fetchData("/notes/create", newNote, "POST")
     .then((note) => {
         console.log("note: "+ note)
-      })
-      .catch((err) => {
+    })
+    .catch((err) => {
         console.log(`Error!!! ${err.message}`)
-      })
+    })
 
     //print note and today's date
     console.log(`note: ${noteContent}\ndate created: ${noteCreationDate}`)
@@ -202,7 +200,7 @@ function addNote(e){
     notes.innerHTML += `
         <div class="note">
             <br>
-            <p>${noteCreationDate}:</p>
+            <p>${displayDate}:</p>
             <br>
             <p>${noteContent}</p>
         </div>
@@ -211,36 +209,52 @@ function addNote(e){
 
     //erase input from form
     document.getElementById('note').value = ''
+
+    //displayNotes()
 }
 
-function displayNotes(){///////////doesnt work yet
-    let user = getCurrentUser()//////////////////////////needs to be fixed
-    let tempNote = new Note(user.userId)
+
+//when user logs in all their notes are displayed
+function displayNotes(){
+    let user = getCurrentUser()
+    let tempNote = new Note(user.userId, "", "1992-10-09")
     console.log("getCuser: " + user.userId)
+    //fetch notes for current user
     fetchData("/notes/getMyNotes", tempNote, "POST")
-    .then((note) => {
-        console.log("notes: "+ note)
-        notes.innerHTML += `
-        <div class="note">
-            <br>
-            <p>${note.dateCreated}:</p>
-            <br>
-            <p>${note.noteContent}</p>
-        </div>
-    `
-      })
-      .catch((err) => {
+    .then((data) => {
+        console.log(data)
+        //forEach only works if i use Object.values
+        Object.values(data).forEach(note => {
+            //removes time from date so that only the date is printed
+            let date = (new Date(note.noteCreationDate)).toLocaleDateString()
+            notes.innerHTML += `
+            <div class="note">
+                <br>
+                <p>${date}:</p>
+                <br>
+                <p>${note.noteContent}</p>
+            </div>
+            `
+        })
+    })
+    .catch((err) => {
         console.log(`Error!!! ${err.message}`)
-      })
-
-      //notes.classList.toggle('hide')///////////////
+    })
+    
 }
 
-function displayUsers(e) {
+//Checks if user is logged in
+if(getCurrentUser()){
+    //==let test1 = getCurrentUser()
+    //console.log(test1)
+    displayNotes()
+}
+
+function displayUsers(e) {//used to display all users in database on the log in pages
     e.preventDefault()
 
     if(users.innerText === ""){ 
-        fetch("http://localhost:3000/users")
+        fetch("http://localhost:3000/users")//does not use fetchData function for testing purposes
         .then((res) => res.json()) //JSON.parse(res)
         .then((data) => {
         console.log(data)
@@ -257,7 +271,7 @@ function displayUsers(e) {
         console.log(`Error!!! ${err.message}`)
         })
     }
-    users.classList.toggle('hide')///////////////
+    users.classList.toggle('hide')
 }
 
 
